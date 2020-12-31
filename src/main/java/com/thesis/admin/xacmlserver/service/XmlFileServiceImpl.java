@@ -1,20 +1,24 @@
 package com.thesis.admin.xacmlserver.service;
 
-import com.thesis.admin.xacmlserver.model.XmlDocument;
-import com.thesis.admin.xacmlserver.model.service.XmlDocumentModelService;
-import com.thesis.admin.xacmlserver.pojo.*;
-import lombok.extern.slf4j.Slf4j;
-import org.hibernate.sql.Delete;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.thesis.admin.xacmlserver.model.XmlDocument;
+import com.thesis.admin.xacmlserver.model.service.XmlDocumentModelService;
+import com.thesis.admin.xacmlserver.pojo.DataObject;
+import com.thesis.admin.xacmlserver.pojo.DeleteSingleFileResponse;
+import com.thesis.admin.xacmlserver.pojo.GetAllXmlFileResponse;
+import com.thesis.admin.xacmlserver.pojo.GetSingleXmlFileReponse;
+import com.thesis.admin.xacmlserver.pojo.SingleXACMLResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -29,7 +33,14 @@ public class XmlFileServiceImpl implements XmlFileService {
         if(message.equalsIgnoreCase("ERROR")) {
             return new ResponseEntity<GetAllXmlFileResponse>(buildEmptyErrorResponse(), HttpStatus.OK);
         } else {
-            List<DataObject> allDataObject = docs.stream().map(name -> new DataObject()).collect(Collectors.toList());
+        	 List<DataObject> allDataObject = new ArrayList<>();
+        	for (XmlDocument xmlDocument : docs) {
+        		DataObject dOb = new DataObject();
+        		dOb.setFileName(xmlDocument.getFileName());
+        		dOb.setServiceName(xmlDocument.getServiceName());
+        		dOb.setXmlContent(xmlDocument.getXmlContent());
+        		allDataObject.add(dOb);
+			}
             GetAllXmlFileResponse fullResponse = new GetAllXmlFileResponse();
             fullResponse.setData(allDataObject);
             fullResponse.setMessage(message);
